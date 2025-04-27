@@ -1,18 +1,23 @@
-const fetchFilm = require('../utils/fetchfilm');
+const fetchFilm = require("../utils/fetchfilm");
 
 const getFilm = async (req, res) => {
-    try {
-        const title = req.params.title;
-        let film = await fetchFilm.getFilm(title); //{}
-        res.status(200).json(film); // Respuesta de la API para 1 producto
+  const title = req.query.title;
+  try {
+    const films = await fetchFilm.getFilm(title);
+    if (!films || films[0].Response === "False") {
+      return res.render("home", { error: "Película no encontrada" });
+    } else {
+      res.render("film", { films });
+      // Enviar la respuesta como JSON
     }
-    catch (error) {
-        console.log(`ERROR: ${error.stack}`);
-        res.status(400).json({msj:`ERROR: ${error.stack}`});
-    }
-}
-
+  } catch (error) {
+    console.log(`ERROR: ${error.stack}`);
+    res
+      .status(500)
+      .render("home", { error: "Error al obtener los datos de la película" });
+  }
+};
 
 module.exports = {
-    getFilm
+  getFilm,
 };
